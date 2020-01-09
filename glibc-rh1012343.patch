@@ -1,0 +1,352 @@
+commit 312be3f9f5eab1643d7dcc7728c76d413d4f2640
+Author: Ulrich Drepper <drepper@gmail.com>
+Date:   Tue Nov 15 04:24:42 2011 -0500
+
+    Clean up internal fopen uses
+    
+    No need to ever not use c and e.
+
+--- a/hesiod/hesiod.c
++++ b/hesiod/hesiod.c
+@@ -278,7 +278,7 @@
+ 	/*
+ 	 * Now open and parse the file...
+ 	 */
+-	if (!(fp = fopen(filename, "r")))
++	if (!(fp = fopen(filename, "rce")))
+ 		return (-1);
+ 
+ 	while (fgets(buf, sizeof(buf), fp) != NULL) {
+--- a/iconv/gconv_conf.c
++++ b/iconv/gconv_conf.c
+@@ -366,7 +366,7 @@
+ {
+   /* Note the file is opened with cancellation in the I/O functions
+      disabled.  */
+-  FILE *fp = fopen (filename, "rc");
++  FILE *fp = fopen (filename, "rce");
+   char *line = NULL;
+   size_t line_len = 0;
+   static int modcounter;
+--- a/inet/rcmd.c
++++ b/inet/rcmd.c
+@@ -488,7 +488,7 @@
+     cp = _("not regular file");
+   else
+     {
+-      res = fopen (file, "rc");
++      res = fopen (file, "rce");
+       if (!res)
+ 	cp = _("cannot open");
+       else if (__fxstat64 (_STAT_VER, fileno (res), &st) < 0)
+--- a/inet/ruserpass.c
++++ b/inet/ruserpass.c
+@@ -114,7 +114,7 @@
+ 	buf = alloca (strlen (hdir) + 8);
+ 
+ 	__stpcpy (__stpcpy (buf, hdir), "/.netrc");
+-	cfile = fopen(buf, "rc");
++	cfile = fopen(buf, "rce");
+ 	if (cfile == NULL) {
+ 		if (errno != ENOENT)
+ 			warn("%s", buf);
+--- a/intl/localealias.c
++++ b/intl/localealias.c
+@@ -221,7 +221,7 @@
+ 
+   /* Note the file is opened with cancellation in the I/O functions
+      disabled.  */
+-  fp = fopen (full_fname, "rc");
++  fp = fopen (full_fname, "rce");
+   freea (full_fname);
+   if (fp == NULL)
+     return 0;
+--- a/misc/getpass.c
++++ b/misc/getpass.c
+@@ -57,7 +57,7 @@
+   /* Try to write to and read from the terminal if we can.
+      If we can't open the terminal, use stderr and stdin.  */
+ 
+-  in = fopen ("/dev/tty", "w+c");
++  in = fopen ("/dev/tty", "w+ce");
+   if (in == NULL)
+     {
+       in = stdin;
+--- a/misc/getusershell.c
++++ b/misc/getusershell.c
+@@ -104,7 +104,7 @@
+ 	shells = NULL;
+ 	free(strings);
+ 	strings = NULL;
+-	if ((fp = fopen(_PATH_SHELLS, "rc")) == NULL)
++	if ((fp = fopen(_PATH_SHELLS, "rce")) == NULL)
+ 		goto init_okshells_noclose;
+ 	if (fstat64(fileno(fp), &statb) == -1) {
+ 	init_okshells:
+--- a/misc/mntent_r.c
++++ b/misc/mntent_r.c
+@@ -40,10 +40,10 @@
+ __setmntent (const char *file, const char *mode)
+ {
+   /* Extend the mode parameter with "c" to disable cancellation in the
+-     I/O functions.  */
++     I/O functions and "e" to set FD_CLOEXEC.  */
+   size_t modelen = strlen (mode);
+   char newmode[modelen + 2];
+-  memcpy (mempcpy (newmode, mode, modelen), "c", 2);
++  memcpy (mempcpy (newmode, mode, modelen), "ce", 2);
+   FILE *result = fopen (file, newmode);
+ 
+   if (result != NULL)
+--- a/nis/nis_file.c
++++ b/nis/nis_file.c
+@@ -31,7 +31,7 @@
+ read_nis_obj (const char *name, iofct_t readfct, freefct_t freefct,
+ 	      size_t objsize)
+ {
+-  FILE *in = fopen (name, "rc");
++  FILE *in = fopen (name, "rce");
+   if (in == NULL)
+     return NULL;
+ 
+@@ -59,7 +59,7 @@
+ static bool_t
+ write_nis_obj (const char *name, const void *obj, iofct_t writefct)
+ {
+-  FILE *out = fopen (name, "w");
++  FILE *out = fopen (name, "wce");
+   if (out == NULL)
+     return FALSE;
+ 
+--- a/nis/nss-default.c
++++ b/nis/nss-default.c
+@@ -57,7 +57,7 @@
+ init (void)
+ {
+   int saved_errno = errno;
+-  FILE *fp = fopen (default_nss, "rc");
++  FILE *fp = fopen (default_nss, "rce");
+   if (fp != NULL)
+     {
+       char *line = NULL;
+--- a/nptl/pthread_getattr_np.c
++++ b/nptl/pthread_getattr_np.c
+@@ -75,7 +75,7 @@
+       /* The safest way to get the top of the stack is to read
+ 	 /proc/self/maps and locate the line into which
+ 	 __libc_stack_end falls.  */
+-      FILE *fp = fopen ("/proc/self/maps", "rc");
++      FILE *fp = fopen ("/proc/self/maps", "rce");
+       if (fp == NULL)
+ 	ret = errno;
+       /* We need the limit of the stack in any case.  */
+--- a/nss/nss_files/files-XXX.c
++++ b/nss/nss_files/files-XXX.c
+@@ -77,7 +77,7 @@
+ 
+   if (stream == NULL)
+     {
+-      stream = fopen (DATAFILE, "re");
++      stream = fopen (DATAFILE, "rce");
+ 
+       if (stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+--- a/nss/nss_files/files-alias.c
++++ b/nss/nss_files/files-alias.c
+@@ -48,7 +48,7 @@
+ 
+   if (stream == NULL)
+     {
+-      stream = fopen ("/etc/aliases", "re");
++      stream = fopen ("/etc/aliases", "rce");
+ 
+       if (stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+@@ -258,7 +258,7 @@
+ 
+ 		      first_unused = cp;
+ 
+-		      listfile = fopen (&cp[9], "r");
++		      listfile = fopen (&cp[9], "rce");
+ 		      /* If the file does not exist we simply ignore
+ 			 the statement.  */
+ 		      if (listfile != NULL
+--- a/nss/nss_files/files-initgroups.c
++++ b/nss/nss_files/files-initgroups.c
+@@ -30,7 +30,7 @@
+ 			   long int *size, gid_t **groupsp, long int limit,
+ 			   int *errnop)
+ {
+-  FILE *stream = fopen ("/etc/group", "re");
++  FILE *stream = fopen ("/etc/group", "rce");
+   if (stream == NULL)
+     {
+       *errnop = errno;
+--- a/nss/nss_files/files-key.c
++++ b/nss/nss_files/files-key.c
+@@ -35,7 +35,7 @@
+ {
+   FILE *stream;
+ 
+-  stream = fopen (DATAFILE, "r");
++  stream = fopen (DATAFILE, "rce");
+   if (stream == NULL)
+     return errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+ 
+--- a/nss/nsswitch.c
++++ b/nss/nsswitch.c
+@@ -455,7 +455,7 @@
+   size_t len;
+ 
+   /* Open the configuration file.  */
+-  fp = fopen (fname, "rc");
++  fp = fopen (fname, "rce");
+   if (fp == NULL)
+     return NULL;
+ 
+--- a/resolv/gethnamaddr.c
++++ b/resolv/gethnamaddr.c
+@@ -800,7 +800,7 @@
+ 	int f;
+ {
+ 	if (!hostf)
+-		hostf = fopen(_PATH_HOSTS, "r" );
++		hostf = fopen(_PATH_HOSTS, "rce" );
+ 	else
+ 		rewind(hostf);
+ 	stayopen = f;
+@@ -823,7 +823,7 @@
+ 	register char *cp, **q;
+ 	int af, len;
+ 
+-	if (!hostf && !(hostf = fopen(_PATH_HOSTS, "r" ))) {
++	if (!hostf && !(hostf = fopen(_PATH_HOSTS, "rce" ))) {
+ 		__set_h_errno (NETDB_INTERNAL);
+ 		return (NULL);
+ 	}
+--- a/resolv/res_query.c
++++ b/resolv/res_query.c
+@@ -614,7 +614,7 @@
+ 	if (statp->options & RES_NOALIASES)
+ 		return (NULL);
+ 	file = getenv("HOSTALIASES");
+-	if (file == NULL || (fp = fopen(file, "r")) == NULL)
++	if (file == NULL || (fp = fopen(file, "rce")) == NULL)
+ 		return (NULL);
+ 	setbuf(fp, NULL);
+ 	buf[sizeof(buf) - 1] = '\0';
+--- a/sysdeps/posix/getaddrinfo.c
++++ b/sysdeps/posix/getaddrinfo.c
+@@ -1933,7 +1933,7 @@
+   size_t nscopelist = 0;
+   bool scopelist_nullbits = false;
+ 
+-  FILE *fp = fopen (GAICONF_FNAME, "rc");
++  FILE *fp = fopen (GAICONF_FNAME, "rce");
+   if (fp != NULL)
+     {
+       struct stat64 st;
+--- a/sysdeps/unix/sysv/linux/readonly-area.c
++++ b/sysdeps/unix/sysv/linux/readonly-area.c
+@@ -32,7 +32,7 @@
+ {
+   const void *ptr_end = ptr + size;
+ 
+-  FILE *fp = fopen ("/proc/self/maps", "rc");
++  FILE *fp = fopen ("/proc/self/maps", "rce");
+   if (fp == NULL)
+     {
+       /* It is the system administrator's choice to not have /proc
+--- a/time/getdate.c
++++ b/time/getdate.c
+@@ -129,7 +129,7 @@
+     return 2;
+ 
+   /* Open the template file.  */
+-  fp = fopen (datemsk, "rc");
++  fp = fopen (datemsk, "rce");
+   if (fp == NULL)
+     return 2;
+ 
+--- a/nss/Makefile
++++ b/nss/Makefile
+@@ -41,7 +41,7 @@
+ install-bin             := getent
+ 
+ tests			= test-netdb tst-nss-test1 test-digits-dots \
+-			  bug17079
++			  bug17079 rhbz1012343
+ xtests			= bug-erange
+ 
+ include ../Makeconfig
+@@ -77,6 +77,7 @@
+ include ../Rules
+ 
+ CFLAGS-files-hosts.c += -fno-strict-aliasing
++LDFLAGS-rhbz1012343 += -lpthread
+ 
+ ifeq (yes,$(build-static-nss))
+ $(objpfx)getent: $(objpfx)libnss_files.a
+--- /dev/null
++++ b/nss/rhbz1012343.c
+@@ -0,0 +1,60 @@
++#include <stdio.h>
++#include <stdbool.h>
++#include <pthread.h>
++#include <pwd.h>
++#include <sys/types.h>
++#include <unistd.h>
++
++volatile bool started = false;
++
++static void *
++routine( void *arg )
++{
++  char buf[256];
++  struct passwd pwbuf, *pw;
++  uid_t uid;
++
++  (void)&arg;
++
++  uid = geteuid();
++  started = true;
++  for(;;) {
++#ifdef DISABLE_CANCEL
++    int oldstate, state;
++    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
++#endif
++    getpwuid_r(uid, &pwbuf, buf, sizeof(buf), &pw);
++#ifdef DISABLE_CANCEL
++    pthread_setcancelstate(oldstate, &state);
++    pthread_testcancel();
++#endif
++  }
++
++  return 0;
++}
++
++int
++do_test (void)
++{
++  char buf[256];
++  struct passwd pwbuf, *pw;
++  pthread_t thread;
++
++  pthread_create(&thread, NULL, routine, NULL);
++  while(!started)
++    sleep (1);
++  sleep(3);
++  printf( "Cancelling thread\n" );
++  while( pthread_cancel(thread) != 0 );
++  printf( "Joining...\n");
++  pthread_join(thread, NULL);
++  printf( "Joined, trying getpwuid_r call\n" );
++
++  getpwuid_r(geteuid(), &pwbuf, buf, sizeof(buf), &pw);
++  printf( "Never get here\n" );
++
++  return 0;
++}
++
++#define TEST_FUNCTION do_test ()
++#include "../test-skeleton.c"
