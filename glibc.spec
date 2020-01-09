@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.12-2-gc4ccff1
 %define glibcversion 2.12
-%define glibcrelease 1.209%{?dist}
+%define glibcrelease 1.209%{?dist}.1
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1502,6 +1502,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 29 2017 Carlos O'Donell <carlos@redhat.com> - 2.12-1.209.1
+- Fix thread cancellation issues for setmntent() and others (#1437618).
+
 * Wed Jan 25 2017 Florian Weimer <fweimer@redhat.com> - 2.12-1.209
 - Fix AF_INET6 getaddrinfo with nscd (#1416496)
 

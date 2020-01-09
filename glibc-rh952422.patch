@@ -1,3 +1,33 @@
+Partial backport of this to fix cancellation issues:
+
+commit 312be3f9f5eab1643d7dcc7728c76d413d4f2640
+Author: Ulrich Drepper <drepper@gmail.com>
+Date:   Tue Nov 15 04:24:42 2011 -0500
+
+    Clean up internal fopen uses
+    
+    No need to ever not use c and e.
+
+Full backports to fix rhbz952422:
+
+commit 84e2a551a72c79b020694bb327e33b6d71b09b63
+Author: Ulrich Drepper <drepper@gmail.com>
+Date:   Wed Jun 22 10:32:07 2011 -0400
+
+    Use a /sys/devices/system/cpu/online for _SC_NPROCESSORS_ONLN implementation
+
+commit 852eb34d5c56bc75bdd82327fcf310d98655f6b0
+Author: Ulrich Drepper <drepper@gmail.com>
+Date:   Wed Jun 22 09:50:39 2011 -0400
+
+    Rate limit expensive _SC_NPROCESSORS_ONLN computation
+
+commit d53a73acdbf6ac6eb99cd06f5dd695da58d9e8f5
+Author: Ulrich Drepper <drepper@gmail.com>
+Date:   Tue Sep 6 20:22:37 2011 -0400
+
+    Avoid gettimeofday vsyscall
+
 diff --git a/sysdeps/unix/sysv/linux/getsysstats.c b/sysdeps/unix/sysv/linux/getsysstats.c
 index af454b6..249bd19 100644
 --- a/sysdeps/unix/sysv/linux/getsysstats.c

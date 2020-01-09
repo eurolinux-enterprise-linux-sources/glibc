@@ -1,3 +1,5 @@
+Partial backport to fix bug 1012343 and bug 1437147.
+
 commit 312be3f9f5eab1643d7dcc7728c76d413d4f2640
 Author: Ulrich Drepper <drepper@gmail.com>
 Date:   Tue Nov 15 04:24:42 2011 -0500
@@ -6,9 +8,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
     
     No need to ever not use c and e.
 
---- a/hesiod/hesiod.c
-+++ b/hesiod/hesiod.c
-@@ -278,7 +278,7 @@
+Index: glibc-2.12-2-gc4ccff1/hesiod/hesiod.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/hesiod/hesiod.c
++++ glibc-2.12-2-gc4ccff1/hesiod/hesiod.c
+@@ -278,7 +278,7 @@ parse_config_file(struct hesiod_p *ctx,
  	/*
  	 * Now open and parse the file...
  	 */
@@ -17,9 +21,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  		return (-1);
  
  	while (fgets(buf, sizeof(buf), fp) != NULL) {
---- a/iconv/gconv_conf.c
-+++ b/iconv/gconv_conf.c
-@@ -366,7 +366,7 @@
+Index: glibc-2.12-2-gc4ccff1/iconv/gconv_conf.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/iconv/gconv_conf.c
++++ glibc-2.12-2-gc4ccff1/iconv/gconv_conf.c
+@@ -366,7 +366,7 @@ read_conf_file (const char *filename, co
  {
    /* Note the file is opened with cancellation in the I/O functions
       disabled.  */
@@ -28,9 +34,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    char *line = NULL;
    size_t line_len = 0;
    static int modcounter;
---- a/inet/rcmd.c
-+++ b/inet/rcmd.c
-@@ -488,7 +488,7 @@
+Index: glibc-2.12-2-gc4ccff1/inet/rcmd.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/inet/rcmd.c
++++ glibc-2.12-2-gc4ccff1/inet/rcmd.c
+@@ -488,7 +488,7 @@ iruserfopen (const char *file, uid_t oku
      cp = _("not regular file");
    else
      {
@@ -39,9 +47,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
        if (!res)
  	cp = _("cannot open");
        else if (__fxstat64 (_STAT_VER, fileno (res), &st) < 0)
---- a/inet/ruserpass.c
-+++ b/inet/ruserpass.c
-@@ -114,7 +114,7 @@
+Index: glibc-2.12-2-gc4ccff1/inet/ruserpass.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/inet/ruserpass.c
++++ glibc-2.12-2-gc4ccff1/inet/ruserpass.c
+@@ -114,7 +114,7 @@ ruserpass(host, aname, apass)
  	buf = alloca (strlen (hdir) + 8);
  
  	__stpcpy (__stpcpy (buf, hdir), "/.netrc");
@@ -50,9 +60,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  	if (cfile == NULL) {
  		if (errno != ENOENT)
  			warn("%s", buf);
---- a/intl/localealias.c
-+++ b/intl/localealias.c
-@@ -221,7 +221,7 @@
+Index: glibc-2.12-2-gc4ccff1/intl/localealias.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/intl/localealias.c
++++ glibc-2.12-2-gc4ccff1/intl/localealias.c
+@@ -221,7 +221,7 @@ read_alias_file (fname, fname_len)
  
    /* Note the file is opened with cancellation in the I/O functions
       disabled.  */
@@ -61,9 +73,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    freea (full_fname);
    if (fp == NULL)
      return 0;
---- a/misc/getpass.c
-+++ b/misc/getpass.c
-@@ -57,7 +57,7 @@
+Index: glibc-2.12-2-gc4ccff1/misc/getpass.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/misc/getpass.c
++++ glibc-2.12-2-gc4ccff1/misc/getpass.c
+@@ -57,7 +57,7 @@ getpass (prompt)
    /* Try to write to and read from the terminal if we can.
       If we can't open the terminal, use stderr and stdin.  */
  
@@ -72,9 +86,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (in == NULL)
      {
        in = stdin;
---- a/misc/getusershell.c
-+++ b/misc/getusershell.c
-@@ -104,7 +104,7 @@
+Index: glibc-2.12-2-gc4ccff1/misc/getusershell.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/misc/getusershell.c
++++ glibc-2.12-2-gc4ccff1/misc/getusershell.c
+@@ -104,7 +104,7 @@ initshells()
  	shells = NULL;
  	free(strings);
  	strings = NULL;
@@ -83,24 +99,29 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  		goto init_okshells_noclose;
  	if (fstat64(fileno(fp), &statb) == -1) {
  	init_okshells:
---- a/misc/mntent_r.c
-+++ b/misc/mntent_r.c
-@@ -40,10 +40,10 @@
+Index: glibc-2.12-2-gc4ccff1/misc/mntent_r.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/misc/mntent_r.c
++++ glibc-2.12-2-gc4ccff1/misc/mntent_r.c
+@@ -40,10 +40,10 @@ FILE *
  __setmntent (const char *file, const char *mode)
  {
    /* Extend the mode parameter with "c" to disable cancellation in the
 -     I/O functions.  */
 +     I/O functions and "e" to set FD_CLOEXEC.  */
    size_t modelen = strlen (mode);
-   char newmode[modelen + 2];
+-  char newmode[modelen + 2];
 -  memcpy (mempcpy (newmode, mode, modelen), "c", 2);
-+  memcpy (mempcpy (newmode, mode, modelen), "ce", 2);
++  char newmode[modelen + 3];
++  memcpy (mempcpy (newmode, mode, modelen), "ce", 3);
    FILE *result = fopen (file, newmode);
  
    if (result != NULL)
---- a/nis/nis_file.c
-+++ b/nis/nis_file.c
-@@ -31,7 +31,7 @@
+Index: glibc-2.12-2-gc4ccff1/nis/nis_file.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nis/nis_file.c
++++ glibc-2.12-2-gc4ccff1/nis/nis_file.c
+@@ -31,7 +31,7 @@ static void *
  read_nis_obj (const char *name, iofct_t readfct, freefct_t freefct,
  	      size_t objsize)
  {
@@ -109,7 +130,7 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (in == NULL)
      return NULL;
  
-@@ -59,7 +59,7 @@
+@@ -59,7 +59,7 @@ read_nis_obj (const char *name, iofct_t
  static bool_t
  write_nis_obj (const char *name, const void *obj, iofct_t writefct)
  {
@@ -118,9 +139,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (out == NULL)
      return FALSE;
  
---- a/nis/nss-default.c
-+++ b/nis/nss-default.c
-@@ -57,7 +57,7 @@
+Index: glibc-2.12-2-gc4ccff1/nis/nss-default.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nis/nss-default.c
++++ glibc-2.12-2-gc4ccff1/nis/nss-default.c
+@@ -57,7 +57,7 @@ static void
  init (void)
  {
    int saved_errno = errno;
@@ -129,9 +152,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (fp != NULL)
      {
        char *line = NULL;
---- a/nptl/pthread_getattr_np.c
-+++ b/nptl/pthread_getattr_np.c
-@@ -75,7 +75,7 @@
+Index: glibc-2.12-2-gc4ccff1/nptl/pthread_getattr_np.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nptl/pthread_getattr_np.c
++++ glibc-2.12-2-gc4ccff1/nptl/pthread_getattr_np.c
+@@ -75,7 +75,7 @@ pthread_getattr_np (thread_id, attr)
        /* The safest way to get the top of the stack is to read
  	 /proc/self/maps and locate the line into which
  	 __libc_stack_end falls.  */
@@ -140,9 +165,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
        if (fp == NULL)
  	ret = errno;
        /* We need the limit of the stack in any case.  */
---- a/nss/nss_files/files-XXX.c
-+++ b/nss/nss_files/files-XXX.c
-@@ -77,7 +77,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/nss_files/files-XXX.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nss_files/files-XXX.c
++++ glibc-2.12-2-gc4ccff1/nss/nss_files/files-XXX.c
+@@ -77,7 +77,7 @@ internal_setent (int stayopen)
  
    if (stream == NULL)
      {
@@ -151,9 +178,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  
        if (stream == NULL)
  	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
---- a/nss/nss_files/files-alias.c
-+++ b/nss/nss_files/files-alias.c
-@@ -48,7 +48,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/nss_files/files-alias.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nss_files/files-alias.c
++++ glibc-2.12-2-gc4ccff1/nss/nss_files/files-alias.c
+@@ -48,7 +48,7 @@ internal_setent (void)
  
    if (stream == NULL)
      {
@@ -162,7 +191,7 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  
        if (stream == NULL)
  	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
-@@ -258,7 +258,7 @@
+@@ -258,7 +258,7 @@ get_next_alias (const char *match, struc
  
  		      first_unused = cp;
  
@@ -171,9 +200,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  		      /* If the file does not exist we simply ignore
  			 the statement.  */
  		      if (listfile != NULL
---- a/nss/nss_files/files-initgroups.c
-+++ b/nss/nss_files/files-initgroups.c
-@@ -30,7 +30,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/nss_files/files-initgroups.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nss_files/files-initgroups.c
++++ glibc-2.12-2-gc4ccff1/nss/nss_files/files-initgroups.c
+@@ -30,7 +30,7 @@ _nss_files_initgroups_dyn (const char *u
  			   long int *size, gid_t **groupsp, long int limit,
  			   int *errnop)
  {
@@ -182,9 +213,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (stream == NULL)
      {
        *errnop = errno;
---- a/nss/nss_files/files-key.c
-+++ b/nss/nss_files/files-key.c
-@@ -35,7 +35,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/nss_files/files-key.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nss_files/files-key.c
++++ glibc-2.12-2-gc4ccff1/nss/nss_files/files-key.c
+@@ -35,7 +35,7 @@ search (const char *netname, char *resul
  {
    FILE *stream;
  
@@ -193,9 +226,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (stream == NULL)
      return errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
  
---- a/nss/nsswitch.c
-+++ b/nss/nsswitch.c
-@@ -455,7 +455,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/nsswitch.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nsswitch.c
++++ glibc-2.12-2-gc4ccff1/nss/nsswitch.c
+@@ -455,7 +455,7 @@ nss_parse_file (const char *fname)
    size_t len;
  
    /* Open the configuration file.  */
@@ -204,9 +239,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (fp == NULL)
      return NULL;
  
---- a/resolv/gethnamaddr.c
-+++ b/resolv/gethnamaddr.c
-@@ -800,7 +800,7 @@
+Index: glibc-2.12-2-gc4ccff1/resolv/gethnamaddr.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/resolv/gethnamaddr.c
++++ glibc-2.12-2-gc4ccff1/resolv/gethnamaddr.c
+@@ -800,7 +800,7 @@ _sethtent(f)
  	int f;
  {
  	if (!hostf)
@@ -215,7 +252,7 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  	else
  		rewind(hostf);
  	stayopen = f;
-@@ -823,7 +823,7 @@
+@@ -823,7 +823,7 @@ _gethtent()
  	register char *cp, **q;
  	int af, len;
  
@@ -224,9 +261,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  		__set_h_errno (NETDB_INTERNAL);
  		return (NULL);
  	}
---- a/resolv/res_query.c
-+++ b/resolv/res_query.c
-@@ -614,7 +614,7 @@
+Index: glibc-2.12-2-gc4ccff1/resolv/res_query.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/resolv/res_query.c
++++ glibc-2.12-2-gc4ccff1/resolv/res_query.c
+@@ -614,7 +614,7 @@ res_hostalias(const res_state statp, con
  	if (statp->options & RES_NOALIASES)
  		return (NULL);
  	file = getenv("HOSTALIASES");
@@ -235,9 +274,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  		return (NULL);
  	setbuf(fp, NULL);
  	buf[sizeof(buf) - 1] = '\0';
---- a/sysdeps/posix/getaddrinfo.c
-+++ b/sysdeps/posix/getaddrinfo.c
-@@ -1933,7 +1933,7 @@
+Index: glibc-2.12-2-gc4ccff1/sysdeps/posix/getaddrinfo.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/sysdeps/posix/getaddrinfo.c
++++ glibc-2.12-2-gc4ccff1/sysdeps/posix/getaddrinfo.c
+@@ -1937,7 +1937,7 @@ gaiconf_init (void)
    size_t nscopelist = 0;
    bool scopelist_nullbits = false;
  
@@ -246,9 +287,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (fp != NULL)
      {
        struct stat64 st;
---- a/sysdeps/unix/sysv/linux/readonly-area.c
-+++ b/sysdeps/unix/sysv/linux/readonly-area.c
-@@ -32,7 +32,7 @@
+Index: glibc-2.12-2-gc4ccff1/sysdeps/unix/sysv/linux/readonly-area.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/sysdeps/unix/sysv/linux/readonly-area.c
++++ glibc-2.12-2-gc4ccff1/sysdeps/unix/sysv/linux/readonly-area.c
+@@ -32,7 +32,7 @@ __readonly_area (const char *ptr, size_t
  {
    const void *ptr_end = ptr + size;
  
@@ -257,9 +300,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (fp == NULL)
      {
        /* It is the system administrator's choice to not have /proc
---- a/time/getdate.c
-+++ b/time/getdate.c
-@@ -129,7 +129,7 @@
+Index: glibc-2.12-2-gc4ccff1/time/getdate.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/time/getdate.c
++++ glibc-2.12-2-gc4ccff1/time/getdate.c
+@@ -129,7 +129,7 @@ __getdate_r (const char *string, struct
      return 2;
  
    /* Open the template file.  */
@@ -268,9 +313,11 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
    if (fp == NULL)
      return 2;
  
---- a/nss/Makefile
-+++ b/nss/Makefile
-@@ -41,7 +41,7 @@
+Index: glibc-2.12-2-gc4ccff1/nss/Makefile
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/Makefile
++++ glibc-2.12-2-gc4ccff1/nss/Makefile
+@@ -41,7 +41,7 @@ others                  := getent
  install-bin             := getent
  
  tests			= test-netdb tst-nss-test1 test-digits-dots \
@@ -279,7 +326,7 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  xtests			= bug-erange
  
  include ../Makeconfig
-@@ -77,6 +77,7 @@
+@@ -77,6 +77,7 @@ endif
  include ../Rules
  
  CFLAGS-files-hosts.c += -fno-strict-aliasing
@@ -287,8 +334,10 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
  
  ifeq (yes,$(build-static-nss))
  $(objpfx)getent: $(objpfx)libnss_files.a
+Index: glibc-2.12-2-gc4ccff1/nss/rhbz1012343.c
+===================================================================
 --- /dev/null
-+++ b/nss/rhbz1012343.c
++++ glibc-2.12-2-gc4ccff1/nss/rhbz1012343.c
 @@ -0,0 +1,60 @@
 +#include <stdio.h>
 +#include <stdbool.h>
@@ -350,3 +399,42 @@ Date:   Tue Nov 15 04:24:42 2011 -0500
 +
 +#define TEST_FUNCTION do_test ()
 +#include "../test-skeleton.c"
+Index: glibc-2.12-2-gc4ccff1/misc/getttyent.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/misc/getttyent.c
++++ glibc-2.12-2-gc4ccff1/misc/getttyent.c
+@@ -192,7 +192,7 @@ setttyent()
+ 	if (tf) {
+ 		(void)rewind(tf);
+ 		return (1);
+-	} else if ((tf = fopen(_PATH_TTYS, "rc"))) {
++	} else if ((tf = fopen(_PATH_TTYS, "rce"))) {
+ 		/* We do the locking ourselves.  */
+ 		__fsetlocking (tf, FSETLOCKING_BYCALLER);
+ 		return (1);
+Index: glibc-2.12-2-gc4ccff1/nss/nss_files/files-netgrp.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/nss/nss_files/files-netgrp.c
++++ glibc-2.12-2-gc4ccff1/nss/nss_files/files-netgrp.c
+@@ -63,7 +63,7 @@ _nss_files_setnetgrent (const char *grou
+     return NSS_STATUS_UNAVAIL;
+ 
+   /* Find the netgroups file and open it.  */
+-  fp = fopen (DATAFILE, "r");
++  fp = fopen (DATAFILE, "rce");
+   if (fp == NULL)
+     status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+   else
+Index: glibc-2.12-2-gc4ccff1/resolv/res_hconf.c
+===================================================================
+--- glibc-2.12-2-gc4ccff1.orig/resolv/res_hconf.c
++++ glibc-2.12-2-gc4ccff1/resolv/res_hconf.c
+@@ -308,7 +308,7 @@ do_init (void)
+   if (hconf_name == NULL)
+     hconf_name = _PATH_HOSTCONF;
+ 
+-  fp = fopen (hconf_name, "rc");
++  fp = fopen (hconf_name, "rce");
+   if (fp)
+     {
+       /* No threads using this stream.  */
