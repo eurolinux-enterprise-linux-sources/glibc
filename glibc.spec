@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.12-2-gc4ccff1
 %define glibcversion 2.12
-%define glibcrelease 1.209%{?dist}.1
+%define glibcrelease 1.209%{?dist}.2
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -273,6 +273,10 @@ Patch240: glibc-rh1384281.patch
 Patch241: glibc-rh1338673.patch
 Patch242: glibc-rh1358015.patch
 Patch243: glibc-rh1012343.patch
+Patch244: glibc-rh1452711-1.patch
+Patch245: glibc-rh1452711-2.patch
+Patch246: glibc-rh1452711-3.patch
+Patch247: glibc-rh1452711-4.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -719,6 +723,10 @@ package or when debugging this package.
 %patch241 -p1
 %patch242 -p1
 %patch243 -p1
+%patch244 -p1
+%patch245 -p1
+%patch246 -p1
+%patch247 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1502,6 +1510,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 26 2017 Florian Weimer <fweimer@redhat.com> - 2.12-1.209.2
+- Avoid large allocas in the dynamic linker (#1452711)
+
 * Wed Mar 29 2017 Carlos O'Donell <carlos@redhat.com> - 2.12-1.209.1
 - Fix thread cancellation issues for setmntent() and others (#1437618).
 
