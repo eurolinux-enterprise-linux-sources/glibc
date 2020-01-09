@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.12-2-gc4ccff1
 %define glibcversion 2.12
-%define glibcrelease 1.209%{?dist}.2
+%define glibcrelease 1.212%{?dist}
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -273,10 +273,12 @@ Patch240: glibc-rh1384281.patch
 Patch241: glibc-rh1338673.patch
 Patch242: glibc-rh1358015.patch
 Patch243: glibc-rh1012343.patch
-Patch244: glibc-rh1452711-1.patch
-Patch245: glibc-rh1452711-2.patch
-Patch246: glibc-rh1452711-3.patch
-Patch247: glibc-rh1452711-4.patch
+Patch244: glibc-rh1452717-1.patch
+Patch245: glibc-rh1452717-2.patch
+Patch246: glibc-rh1452717-3.patch
+Patch247: glibc-rh1452717-4.patch
+Patch248: glibc-rh1504810-1.patch
+Patch249: glibc-rh1504810-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -727,6 +729,8 @@ package or when debugging this package.
 %patch245 -p1
 %patch246 -p1
 %patch247 -p1
+%patch248 -p1
+%patch249 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1510,11 +1514,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri May 26 2017 Florian Weimer <fweimer@redhat.com> - 2.12-1.209.2
-- Avoid large allocas in the dynamic linker (#1452711)
+* Fri Nov 17 2017 Patsy Franklin <pfrankli@redhat.com> - 2.12-1.212
+- CVE-2017-15670: glob: Fix one-byte overflow with GLOB_TILDE (#1504810)
+- CVE-2017-15804: glob: Fix buffer overflow in GLOB_TILDE unescaping (#1504810)
 
-* Wed Mar 29 2017 Carlos O'Donell <carlos@redhat.com> - 2.12-1.209.1
-- Fix thread cancellation issues for setmntent() and others (#1437618).
+* Mon Jun 19 2017 Florian Weimer <fweimer@redhat.com> - 2.12-1.211
+- Avoid large allocas in the dynamic linker (#1452717)
+
+* Wed Mar 29 2017 Carlos O'Donell <carlos@redhat.com> - 2.12-1.210
+- Fix thread cancellation issues for setmntent() and others (#1437147).
 
 * Wed Jan 25 2017 Florian Weimer <fweimer@redhat.com> - 2.12-1.209
 - Fix AF_INET6 getaddrinfo with nscd (#1416496)
