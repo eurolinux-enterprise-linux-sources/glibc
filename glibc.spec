@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.12-2-gc4ccff1
 %define glibcversion 2.12
-%define glibcrelease 1.212%{?dist}
+%define glibcrelease 1.212%{?dist}.3
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -279,6 +279,10 @@ Patch246: glibc-rh1452717-3.patch
 Patch247: glibc-rh1452717-4.patch
 Patch248: glibc-rh1504810-1.patch
 Patch249: glibc-rh1504810-2.patch
+Patch250: glibc-rh1668169.patch
+Patch251: glibc-rh1555930-1.patch
+Patch252: glibc-rh1555930-2.patch
+Patch253: glibc-rh1577437.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -731,6 +735,10 @@ package or when debugging this package.
 %patch247 -p1
 %patch248 -p1
 %patch249 -p1
+%patch250 -p1
+%patch251 -p1
+%patch252 -p1
+%patch253 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1514,6 +1522,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Apr  1 2019 Florian Weimer <fweimer@redhat.com> - 2.12-1.212.3
+- Remove abort() warning in manual (#1577437)
+
+* Mon Apr  1 2019 Florian Weimer <fweimer@redhat.com> - 2.12-1.212.2
+- ja_JP: Add new Japanese Era name (#1555930)
+
+* Mon Apr  1 2019 Florian Weimer <fweimer@redhat.com> - 2.12-1.212.1
+- regex: Fix false match in trailing characters (#1668169)
+
 * Fri Nov 17 2017 Patsy Franklin <pfrankli@redhat.com> - 2.12-1.212
 - CVE-2017-15670: glob: Fix one-byte overflow with GLOB_TILDE (#1504810)
 - CVE-2017-15804: glob: Fix buffer overflow in GLOB_TILDE unescaping (#1504810)
